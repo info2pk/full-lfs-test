@@ -10,7 +10,7 @@ from singlebeat.locks import LOCK
 
 class SingleBeatValidateLockTestCase(unittest.TestCase):
 
-    ARGS = ["single-beat-test","/home/omar.gomez/.virtualenvs/singlebeat/bin/single-beat","/home/omar.gomez/.virtualenvs/singlebeat/bin/celery","beat","--loglevel=DEBUG"]
+    ARGS = ["single-beat-test","/home/<USER>/.virtualenvs/singlebeat/bin/single-beat","/home/<USER>/.virtualenvs/singlebeat/bin/celery","beat","--loglevel=DEBUG"]
 
     def setUp(self):
         self.instance1 = singlebeat.beat.Process(sys.argv)
@@ -44,7 +44,7 @@ class SingleBeatValidateLockTestCase(unittest.TestCase):
     def timeout_handler2(self,signum, frame):   # Custom signal handler
         print "State instance 1: "+self.instance1.state
         print "State instance 2: "+self.instance2.state
-        self.testResult = (self.instance1.state != self.instance2.state)
+        self.testResult = (self.instance1.state == "RUNNING" and self.instance2.state == "WAITING")
         self.instance1.loop.stop()
         self.instance2.loop.stop()
 
