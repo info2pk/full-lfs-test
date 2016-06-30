@@ -4,15 +4,32 @@ import pyuv
 import sys
 import unittest
 import singlebeat.beat
+import subprocess
+import os
 from singlebeat.locks import LOCK
 
-class prepareTest():
+class SingleBeatValidateLockTestCase(unittest.TestCase):
 
-    instance1 = singlebeat.beat.Process(sys.argv)
-    instance2 = singlebeat.beat.Process(sys.argv)
-    testResult = False
+    ARGS = ["single-beat-test","/home/omar.gomez/.virtualenvs/singlebeat/bin/single-beat","/home/omar.gomez/.virtualenvs/singlebeat/bin/celery","beat","--loglevel=DEBUG"]
 
-    def test_validate_instance_lock(self,ARGS):
+    def setUp(self):
+        self.instance1 = singlebeat.beat.Process(sys.argv)
+        self.instance2 = singlebeat.beat.Process(sys.argv)
+        self.testResult = False
+
+    def tearDown(self):
+        p = subprocess.Popen(['pgrep', '-l' , 'single-beat'], stdout=subprocess.PIPE)
+        out, err = p.communicate()
+
+        for line in out.splitlines():        
+            line = bytes.decode(line)
+            pid = int(line.split(None, 1)[0])
+            os.kill(pid, signal.SIGKILL)
+
+    def test_lock(self):
+        self.assertTrue(self.validate_instance_lock(self.ARGS), msg=None)
+
+    def validate_instance_lock(self,ARGS):
         sys.argv = ARGS
         signal.signal(signal.SIGALRM, self.timeout_handler)
         signal.alarm(2)
@@ -39,14 +56,6 @@ class prepareTest():
             self.instance2.loop.run(pyuv.UV_RUN_ONCE)
         except Exception as e:
             print e
-    
-class SingleBeatValidateLockTestCase(unittest.TestCase):
-
-    ARGS = ["single-beat","/Users/cone/virtualenvs/singlebeat/bin/single-beat","/Users/cone/virtualenvs/singlebeat/bin/celery","beat","--loglevel=DEBUG"]
-
-    def test_lock(self):
-        pt = prepareTest()
-        self.assertTrue(pt.test_validate_instance_lock(self.ARGS), msg=None)
 
 if __name__ == '__main__':
     unittest.main()
