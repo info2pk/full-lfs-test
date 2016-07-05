@@ -153,6 +153,15 @@ SINGLE_BEAT_REDIS_SERVER='redis://redis-host:6379/1' single-beat celery beat
 
     it will try to spawn celerybeat every 60 seconds.
 
+Tests
+--------------
+
+Run tests to validate everything
+```
+$ workon distribution-consumer
+$ tox
+```
+
 Usage Patterns
 --------------
 

@@ -1,12 +1,12 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
-    name='single-beat',
+    name='singlebeat',
     version='0.1.7',
     long_description=__doc__,
     description='ensures only one instance of your process across your servers',
     url='https://github.com/ybrs/single-beat',
-    packages=['singlebeat'],
+    packages=find_packages(),
     zip_safe=True,
     install_requires=[
         'pyuv >= 0.10,<1.0.0',
